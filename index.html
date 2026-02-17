@@ -108,41 +108,197 @@
             100% { transform: translateY(0); }
         }
 
-        /* Ícone animado do sol a subir/descer */
-        .sunrise-icon, .sunset-icon {
-            width: 22px;
-            height: 22px;
+        /* Ícones grandes do estado do tempo */
+        .weather-icon-container {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .weather-icon {
+            width: 60px;
+            height: 60px;
             position: relative;
         }
 
-        .sunrise-icon .sun,
-        .sunset-icon .sun {
-            width: 14px;
-            height: 14px;
-            background: radial-gradient(circle, #ffeb3b 40%, #fbc02d 70%);
+        /* Sol */
+        .sun {
             border-radius: 50%;
+            background: radial-gradient(circle, #ffeb3b 40%, #fbc02d 70%);
+            animation: sun-rotate 12s linear infinite;
+        }
+
+        @keyframes sun-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Nuvem */
+        .cloud {
+            background: #cfd8dc;
+            border-radius: 50px;
+            width: 60px;
+            height: 35px;
+            position: relative;
+            animation: cloud-move 4s ease-in-out infinite alternate;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: "";
             position: absolute;
-            left: 4px;
-            animation: sun-move 3s ease-in-out infinite;
+            background: #cfd8dc;
+            border-radius: 50%;
         }
 
-        .sunrise-icon .horizon,
-        .sunset-icon .horizon {
-            width: 22px;
-            height: 3px;
-            background: #ff9800;
+        .cloud::before {
+            width: 30px;
+            height: 30px;
+            top: -15px;
+            left: 5px;
+        }
+
+        .cloud::after {
+            width: 25px;
+            height: 25px;
+            top: -10px;
+            right: 5px;
+        }
+
+        @keyframes cloud-move {
+            from { transform: translateX(-4px); }
+            to { transform: translateX(4px); }
+        }
+
+        /* Chuva */
+        .rain {
+            background: #cfd8dc;
+            border-radius: 50px;
+            width: 60px;
+            height: 35px;
+            position: relative;
+        }
+
+        .rain::before,
+        .rain::after {
+            content: "";
             position: absolute;
-            bottom: 2px;
-            border-radius: 2px;
+            background: #cfd8dc;
+            border-radius: 50%;
         }
 
-        @keyframes sun-move {
-            0% { bottom: 2px; opacity: 0.2; }
-            50% { bottom: 10px; opacity: 1; }
-            100% { bottom: 2px; opacity: 0.2; }
+        .rain::before {
+            width: 30px;
+            height: 30px;
+            top: -15px;
+            left: 5px;
         }
 
-        /* Ícone sensação térmica */
+        .rain::after {
+            width: 25px;
+            height: 25px;
+            top: -10px;
+            right: 5px;
+        }
+
+        .rain .drop {
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            background: #2196f3;
+            border-radius: 50%;
+            bottom: -10px;
+            animation: drop-fall 0.8s linear infinite;
+        }
+
+        .rain .drop:nth-child(1) { left: 15px; animation-delay: 0s; }
+        .rain .drop:nth-child(2) { left: 28px; animation-delay: 0.2s; }
+        .rain .drop:nth-child(3) { left: 41px; animation-delay: 0.4s; }
+
+        @keyframes drop-fall {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(12px); opacity: 0; }
+        }
+
+        /* Trovoada */
+        .storm {
+            background: #b0bec5;
+            border-radius: 50px;
+            width: 60px;
+            height: 35px;
+            position: relative;
+        }
+
+        .storm::before,
+        .storm::after {
+            content: "";
+            position: absolute;
+            background: #b0bec5;
+            border-radius: 50%;
+        }
+
+        .storm::before {
+            width: 30px;
+            height: 30px;
+            top: -15px;
+            left: 5px;
+        }
+
+        .storm::after {
+            width: 25px;
+            height: 25px;
+            top: -10px;
+            right: 5px;
+        }
+
+        .storm .bolt {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 18px solid #ffeb3b;
+            left: 26px;
+            top: 20px;
+            animation: bolt-flash 1.2s infinite;
+        }
+
+        @keyframes bolt-flash {
+            0%, 80% { opacity: 0; }
+            81%, 100% { opacity: 1; }
+        }
+
+        /* Nevoeiro */
+        .fog {
+            width: 60px;
+            height: 40px;
+            position: relative;
+        }
+
+        .fog .line {
+            position: absolute;
+            width: 60px;
+            height: 6px;
+            background: #b0bec5;
+            border-radius: 3px;
+            animation: fog-move 3s ease-in-out infinite alternate;
+        }
+
+        .fog .line:nth-child(1) { top: 10px; animation-delay: 0s; }
+        .fog .line:nth-child(2) { top: 22px; animation-delay: 0.5s; }
+
+        @keyframes fog-move {
+            from { transform: translateX(-5px); }
+            to { transform: translateX(5px); }
+        }
+
+        /* Ícone sensação térmica (termómetro + vento suave) */
         .thermo-wind {
             width: 22px;
             height: 22px;
@@ -194,6 +350,70 @@
             50% { transform: translateX(4px); opacity: 1; }
             100% { transform: translateX(0); opacity: 0.6; }
         }
+
+        /* Ícone animado do sol a subir/descer */
+        .sunrise-icon, .sunset-icon {
+            width: 22px;
+            height: 22px;
+            position: relative;
+        }
+
+        .sunrise-icon .sun,
+        .sunset-icon .sun {
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, #ffeb3b 40%, #fbc02d 70%);
+            border-radius: 50%;
+            position: absolute;
+            left: 4px;
+            animation: sun-move 3s ease-in-out infinite;
+        }
+
+        .sunrise-icon .horizon,
+        .sunset-icon .horizon {
+            width: 22px;
+            height: 3px;
+            background: #ff9800;
+            position: absolute;
+            bottom: 2px;
+            border-radius: 2px;
+        }
+
+        @keyframes sun-move {
+            0% { bottom: 2px; opacity: 0.2; }
+            50% { bottom: 10px; opacity: 1; }
+            100% { bottom: 2px; opacity: 0.2; }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .coluna {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
+
+            #cidadeSelect {
+                width: 100%;
+            }
+
+            .linha {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -224,7 +444,45 @@
         </div>
     </div>
 <script>
-/* Ícones SVG principais */
+/* Ícone principal do estado do tempo (sol, nuvens, chuva, etc.) */
+function iconEstadoTempo(id) {
+
+    if (id === 1) {
+        return `<div class="weather-icon sun"></div>`;
+    }
+
+    if ([2, 3, 4].includes(id)) {
+        return `<div class="weather-icon cloud"></div>`;
+    }
+
+    if ([5, 6, 7, 8].includes(id)) {
+        return `
+            <div class="weather-icon rain">
+                <div class="drop"></div>
+                <div class="drop"></div>
+                <div class="drop"></div>
+            </div>`;
+    }
+
+    if (id === 9) {
+        return `
+            <div class="weather-icon storm">
+                <div class="bolt"></div>
+            </div>`;
+    }
+
+    if ([27, 28].includes(id)) {
+        return `
+            <div class="weather-icon fog">
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>`;
+    }
+
+    return `<div class="weather-icon cloud"></div>`;
+}
+
+/* Ícones pequenos SVG */
 const icons = {
     tMin: `<svg fill="#2196f3" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
     tMax: `<svg fill="#e53935" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
@@ -387,51 +645,7 @@ async function obterSol(cidadeID) {
     return dados.data.find(item => item.globalIdLocal == cidadeID);
 }
 
-    /* Ícone principal do estado do tempo (sol, nuvens, chuva, etc.) */
-function iconEstadoTempo(id) {
-
-    // Céu limpo
-    if (id === 1) {
-        return `<div class="weather-icon sun"></div>`;
-    }
-
-    // Pouco nublado / nublado
-    if ([2, 3, 4].includes(id)) {
-        return `<div class="weather-icon cloud"></div>`;
-    }
-
-    // Chuva / aguaceiros
-    if ([5, 6, 7, 8].includes(id)) {
-        return `
-            <div class="weather-icon rain">
-                <div class="drop"></div>
-                <div class="drop"></div>
-                <div class="drop"></div>
-            </div>`;
-    }
-
-    // Trovoada
-    if (id === 9) {
-        return `
-            <div class="weather-icon storm">
-                <div class="bolt"></div>
-            </div>`;
-    }
-
-    // Nevoeiro
-    if ([27, 28].includes(id)) {
-        return `
-            <div class="weather-icon fog">
-                <div class="line"></div>
-                <div class="line"></div>
-            </div>`;
-    }
-
-    // Default: nuvem
-    return `<div class="weather-icon cloud"></div>`;
-}
-
-/* Começo da função carregarDados() */
+/* Carregar dados de um dia/coluna */
 async function carregarDados(url, colunaId, cidadeID) {
 
     const resposta = await fetch(url);
@@ -451,9 +665,8 @@ async function carregarDados(url, colunaId, cidadeID) {
     }
 
     coluna.style.background = corPorEstado(cidade.idWeatherType);
-
     iconBox.innerHTML = iconEstadoTempo(cidade.idWeatherType);
-    /* Sensação térmica */
+
     const sensacao = calcularSensacao(
         cidade.tMin,
         cidade.tMax,
@@ -464,7 +677,7 @@ async function carregarDados(url, colunaId, cidadeID) {
         cidade.classWindSpeed
     );
 
-    /* Mostrar temperaturas */
+    /* Temperaturas */
     ["tMin", "tMax"].forEach(campo => {
         const linha = document.createElement("div");
         linha.className = "linha";
