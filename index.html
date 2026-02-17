@@ -16,10 +16,17 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
             font-size: 28px;
             font-weight: 600;
             color: #0d47a1;
+        }
+
+        #dataHora {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #444;
         }
 
         #cidadeSelect {
@@ -37,7 +44,7 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            flex-wrap: nowrap; /* força tudo na mesma linha */
+            flex-wrap: nowrap;
         }
 
         .coluna {
@@ -47,6 +54,7 @@
             padding: 18px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+            transition: background 0.3s ease;
         }
 
         .coluna h2 {
@@ -77,6 +85,8 @@
 
     <h1>IPMA PREVISÃO METEOROLÓGICA ATÉ 3 DIAS</h1>
 
+    <div id="dataHora"></div>
+
     <select id="cidadeSelect"></select>
 
     <div class="container">
@@ -103,6 +113,7 @@
 
         const apiCidades = "https://api.ipma.pt/open-data/distrits-islands.json";
 
+        // ÍCONES SVG embutidos
         const icons = {
             tMin: `<svg fill="#2196f3" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
             tMax: `<svg fill="#e53935" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
@@ -118,6 +129,31 @@
             predWindDir: "Direção do vento",
             classWindSpeed: "Intensidade do vento"
         };
+
+        // Cores dinâmicas por estado do tempo
+        function corPorEstado(idWeatherType) {
+            if (idWeatherType === 1) return "#ffe082"; // sol
+            if ([2,3,4].includes(idWeatherType)) return "#cfd8dc"; // nublado
+            if ([5,6,7,8].includes(idWeatherType)) return "#b3e5fc"; // chuva
+            if ([9,10,11].includes(idWeatherType)) return "#90caf9"; // chuva forte
+            return "#e0f2f1"; // padrão
+        }
+
+        // Atualizar data e hora
+        function atualizarDataHora() {
+            const agora = new Date();
+            const formatado = agora.toLocaleString("pt-PT", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+            document.getElementById("dataHora").textContent = formatado;
+        }
+        setInterval(atualizarDataHora, 1000);
+        atualizarDataHora();
 
         async function carregarCidades() {
             const resposta = await fetch(apiCidades);
@@ -141,6 +177,8 @@
             const dados = await resposta.json();
 
             const container = document.querySelector(`#${colunaId} .conteudo`);
+            const coluna = document.getElementById(colunaId);
+
             container.innerHTML = "";
 
             const cidade = dados.data.find(item => item.globalIdLocal == cidadeID);
@@ -149,6 +187,9 @@
                 container.innerHTML = "Sem dados.";
                 return;
             }
+
+            // aplicar cor dinâmica
+            coluna.style.background = corPorEstado(cidade.idWeatherType);
 
             const campos = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
 
@@ -172,6 +213,9 @@
             carregarDados(api2, "coluna2", cidadeID);
             carregarDados(api3, "coluna3", cidadeID);
         }
+
+        // Atualização automática a cada 15 minutos
+        setInterval(atualizarPrevisao, 15 * 60 * 1000);
 
         document.getElementById("cidadeSelect").addEventListener("change", atualizarPrevisao);
 
