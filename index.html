@@ -10,22 +10,22 @@
             font-family: "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
             padding: 30px;
-            background: linear-gradient(135deg, #e3f2fd, #ffffff);
+            background: #eef4fa;
             color: #333;
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 32px;
+            margin-bottom: 25px;
+            font-size: 28px;
             font-weight: 600;
             color: #0d47a1;
         }
 
         #cidadeSelect {
             display: block;
-            margin: 0 auto 30px auto;
-            padding: 12px;
+            margin: 0 auto 25px auto;
+            padding: 10px;
             font-size: 16px;
             border-radius: 8px;
             border: 1px solid #90caf9;
@@ -35,46 +35,42 @@
 
         .container {
             display: flex;
-            gap: 25px;
+            gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
         .coluna {
             flex: 1;
-            min-width: 280px;
-            max-width: 350px;
+            min-width: 250px;
+            max-width: 300px;
             background: white;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .coluna:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.10);
         }
 
         .coluna h2 {
             text-align: center;
             margin-top: 0;
-            font-size: 22px;
+            font-size: 20px;
             color: #1565c0;
         }
 
-        .icone {
-            display: block;
-            margin: 10px auto 20px auto;
-            width: 90px;
+        .linha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f5f9ff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 15px;
         }
 
-        .campo {
-            margin-bottom: 12px;
-            font-size: 16px;
-            padding: 8px 12px;
-            background: #f1f8ff;
-            border-radius: 6px;
+        .linha img {
+            width: 22px;
+            height: 22px;
         }
     </style>
 </head>
@@ -87,19 +83,16 @@
     <div class="container">
         <div class="coluna" id="coluna1">
             <h2>Previsão 1º dia</h2>
-            <img class="icone" id="icon1">
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna2">
             <h2>Previsão 2º dia</h2>
-            <img class="icone" id="icon2">
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna3">
             <h2>Previsão 3º dia</h2>
-            <img class="icone" id="icon3">
             <div class="conteudo"></div>
         </div>
     </div>
@@ -111,10 +104,18 @@
 
         const apiCidades = "https://api.ipma.pt/open-data/distrits-islands.json";
 
+        const icons = {
+            tMin: "https://img.icons8.com/fluency/48/temperature-low.png",
+            tMax: "https://img.icons8.com/fluency/48/temperature-high.png",
+            precipitaProb: "https://img.icons8.com/fluency/48/rain.png",
+            predWindDir: "https://img.icons8.com/fluency/48/wind-rose.png",
+            classWindSpeed: "https://img.icons8.com/fluency/48/wind.png"
+        };
+
         const nomesCampos = {
-            tMin: "Temperatura mínima (°C)",
-            tMax: "Temperatura máxima (°C)",
-            precipitaProb: "Probabilidade de precipitação (%)",
+            tMin: "Temperatura mínima",
+            tMax: "Temperatura máxima",
+            precipitaProb: "Probabilidade de precipitação",
             predWindDir: "Direção do vento",
             classWindSpeed: "Intensidade do vento"
         };
@@ -133,50 +134,44 @@
                 select.appendChild(option);
             });
 
-            // Carregar previsão inicial
             atualizarPrevisao();
         }
 
-        async function carregarDados(url, colunaId, iconId, cidadeID) {
-            try {
-                const resposta = await fetch(url);
-                const dados = await resposta.json();
+        async function carregarDados(url, colunaId, cidadeID) {
+            const resposta = await fetch(url);
+            const dados = await resposta.json();
 
-                const container = document.querySelector(`#${colunaId} .conteudo`);
-                const iconImg = document.getElementById(iconId);
+            const container = document.querySelector(`#${colunaId} .conteudo`);
+            container.innerHTML = "";
 
-                container.innerHTML = "";
+            const cidade = dados.data.find(item => item.globalIdLocal == cidadeID);
 
-                const cidade = dados.data.find(item => item.globalIdLocal == cidadeID);
-
-                if (!cidade) {
-                    container.innerHTML = "Sem dados para esta cidade.";
-                    return;
-                }
-
-                iconImg.src = `https://www.ipma.pt/resources.www/icons_svg/weather/w_ic_d_${cidade.idWeatherType}.svg`;
-
-                const camposMostrar = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
-
-                camposMostrar.forEach(campo => {
-                    const div = document.createElement("div");
-                    div.className = "campo";
-                    div.textContent = `${nomesCampos[campo]}: ${cidade[campo]}`;
-                    container.appendChild(div);
-                });
-
-            } catch (erro) {
-                document.querySelector(`#${colunaId} .conteudo`).innerHTML =
-                    "Erro ao carregar dados.";
+            if (!cidade) {
+                container.innerHTML = "Sem dados.";
+                return;
             }
+
+            const campos = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
+
+            campos.forEach(campo => {
+                const linha = document.createElement("div");
+                linha.className = "linha";
+
+                linha.innerHTML = `
+                    <img src="${icons[campo]}" alt="">
+                    <span><strong>${nomesCampos[campo]}:</strong> ${cidade[campo]}</span>
+                `;
+
+                container.appendChild(linha);
+            });
         }
 
         function atualizarPrevisao() {
             const cidadeID = document.getElementById("cidadeSelect").value;
 
-            carregarDados(api1, "coluna1", "icon1", cidadeID);
-            carregarDados(api2, "coluna2", "icon2", cidadeID);
-            carregarDados(api3, "coluna3", "icon3", cidadeID);
+            carregarDados(api1, "coluna1", cidadeID);
+            carregarDados(api2, "coluna2", cidadeID);
+            carregarDados(api3, "coluna3", cidadeID);
         }
 
         document.getElementById("cidadeSelect").addEventListener("change", atualizarPrevisao);
