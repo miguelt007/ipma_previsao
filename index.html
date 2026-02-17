@@ -108,7 +108,7 @@
             100% { transform: translateY(0); }
         }
 
-        /* Ícones grandes do estado do tempo */
+        /* Ícones grandes */
         .weather-icon-container {
             width: 80px;
             height: 80px;
@@ -298,7 +298,7 @@
             to { transform: translateX(5px); }
         }
 
-        /* Ícone sensação térmica (termómetro + vento suave) */
+        /* Ícone sensação térmica */
         .thermo-wind {
             width: 22px;
             height: 22px;
@@ -349,40 +349,6 @@
             0% { transform: translateX(0); opacity: 0.6; }
             50% { transform: translateX(4px); opacity: 1; }
             100% { transform: translateX(0); opacity: 0.6; }
-        }
-
-        /* Ícone animado do sol a subir/descer */
-        .sunrise-icon, .sunset-icon {
-            width: 22px;
-            height: 22px;
-            position: relative;
-        }
-
-        .sunrise-icon .sun,
-        .sunset-icon .sun {
-            width: 14px;
-            height: 14px;
-            background: radial-gradient(circle, #ffeb3b 40%, #fbc02d 70%);
-            border-radius: 50%;
-            position: absolute;
-            left: 4px;
-            animation: sun-move 3s ease-in-out infinite;
-        }
-
-        .sunrise-icon .horizon,
-        .sunset-icon .horizon {
-            width: 22px;
-            height: 3px;
-            background: #ff9800;
-            position: absolute;
-            bottom: 2px;
-            border-radius: 2px;
-        }
-
-        @keyframes sun-move {
-            0% { bottom: 2px; opacity: 0.2; }
-            50% { bottom: 10px; opacity: 1; }
-            100% { bottom: 2px; opacity: 0.2; }
         }
 
         @media (max-width: 900px) {
@@ -444,7 +410,8 @@
         </div>
     </div>
 <script>
-/* Ícone principal do estado do tempo (sol, nuvens, chuva, etc.) */
+
+/* Ícone principal do estado do tempo */
 function iconEstadoTempo(id) {
 
     if (id === 1) {
@@ -490,19 +457,6 @@ const icons = {
     predWindDir: `<svg fill="#0277bd" viewBox="0 0 24 24"><path d="M2 12l20-8-8 20-2-9-10-3z"/></svg>`,
     classWindSpeed: `<svg fill="#00acc1" viewBox="0 0 24 24"><path d="M4 10h13a3 3 0 1 0-3-3"/><path d="M4 14h9a3 3 0 1 1-3 3"/></svg>`
 };
-
-/* Ícones animados nascer/pôr do sol */
-const iconSunrise = `
-<div class="sunrise-icon">
-    <div class="sun"></div>
-    <div class="horizon"></div>
-</div>`;
-
-const iconSunset = `
-<div class="sunset-icon">
-    <div class="sun"></div>
-    <div class="horizon"></div>
-</div>`;
 
 /* Nomes dos campos */
 const nomesCampos = {
@@ -638,13 +592,6 @@ function iconSensacao(temp) {
     `;
 }
 
-/* Obter nascer/pôr do sol */
-async function obterSol(cidadeID) {
-    const resp = await fetch("https://api.ipma.pt/open-data/sunrise-sunset.json");
-    const dados = await resp.json();
-    return dados.data.find(item => item.globalIdLocal == cidadeID);
-}
-
 /* Carregar dados de um dia/coluna */
 async function carregarDados(url, colunaId, cidadeID) {
 
@@ -690,7 +637,7 @@ async function carregarDados(url, colunaId, cidadeID) {
         container.appendChild(linha);
     });
 
-    /* Sensação térmica (O2 — depois das temperaturas) */
+    /* Sensação térmica */
     const linhaSensacao = document.createElement("div");
     linhaSensacao.className = "linha";
     linhaSensacao.innerHTML = `
@@ -698,27 +645,6 @@ async function carregarDados(url, colunaId, cidadeID) {
         <span><strong>Sensação térmica:</strong> ${sensacao} ºC</span>
     `;
     container.appendChild(linhaSensacao);
-
-    /* Nascer e pôr do sol */
-    const sol = await obterSol(cidadeID);
-
-    if (sol) {
-        const linhaNascer = document.createElement("div");
-        linhaNascer.className = "linha";
-        linhaNascer.innerHTML = `
-            ${iconSunrise}
-            <span><strong>Nascer do sol:</strong> ${sol.sunrise}</span>
-        `;
-        container.appendChild(linhaNascer);
-
-        const linhaPor = document.createElement("div");
-        linhaPor.className = "linha";
-        linhaPor.innerHTML = `
-            ${iconSunset}
-            <span><strong>Pôr do sol:</strong> ${sol.sunset}</span>
-        `;
-        container.appendChild(linhaPor);
-    }
 
     /* Restantes campos */
     ["precipitaProb", "predWindDir", "classWindSpeed"].forEach(campo => {
@@ -756,6 +682,7 @@ document.getElementById("cidadeSelect").addEventListener("change", atualizarPrev
 
 /* Carregar cidades ao iniciar */
 carregarCidades();
+
 </script>
 
 </body>
