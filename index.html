@@ -78,7 +78,7 @@
         .coluna h2 {
             text-align: center;
             margin-top: 0;
-            font-size: 20px;
+            font-size: 18px;
             color: #1565c0;
         }
 
@@ -181,7 +181,6 @@
         function atualizarDataHora() {
             const agora = new Date();
             const formatado = agora.toLocaleString("pt-PT", {
-                weekday: "long",
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -199,14 +198,13 @@
             const depois = new Date(hoje.getTime() + 2 * 86400000);
 
             const format = d => d.toLocaleDateString("pt-PT", {
-                weekday: "long",
                 day: "numeric",
                 month: "long"
             });
 
-            document.getElementById("titulo1").textContent = `Previsão para hoje — ${format(hoje)}`;
-            document.getElementById("titulo2").textContent = `Previsão para amanhã — ${format(amanha)}`;
-            document.getElementById("titulo3").textContent = `Previsão para depois — ${format(depois)}`;
+            document.getElementById("titulo1").textContent = `Previsão para ${format(hoje)}`;
+            document.getElementById("titulo2").textContent = `Previsão para ${format(amanha)}`;
+            document.getElementById("titulo3").textContent = `Previsão para ${format(depois)}`;
         }
 
         atualizarTitulos();
