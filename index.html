@@ -66,10 +66,6 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        .animate {
-            animation: fadeIn 0.9s ease forwards;
-        }
-
         .coluna:hover {
             transform: translateY(-8px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.18);
@@ -112,10 +108,7 @@
             100% { transform: translateY(0); }
         }
 
-        /* ================================
-           ÍCONES ANIMADOS PREMIUM (C2)
-           ================================ */
-
+        /* Ícones animados */
         .weather-icon-container {
             width: 80px;
             height: 80px;
@@ -134,7 +127,7 @@
             position: relative;
         }
 
-        /* ☀️ Sol */
+        /* Sol */
         .sun {
             border-radius: 50%;
             background: radial-gradient(circle, #ffeb3b 40%, #fbc02d 70%);
@@ -146,7 +139,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ☁️ Nuvem */
+        /* Nuvem */
         .cloud {
             background: #cfd8dc;
             border-radius: 50px;
@@ -183,7 +176,7 @@
             to { transform: translateX(4px); }
         }
 
-        /* 🌧️ Chuva */
+        /* Chuva */
         .rain {
             background: #cfd8dc;
             border-radius: 50px;
@@ -233,7 +226,7 @@
             100% { transform: translateY(12px); opacity: 0; }
         }
 
-        /* ⛈️ Trovoada */
+        /* Trovoada */
         .storm {
             background: #b0bec5;
             border-radius: 50px;
@@ -281,7 +274,7 @@
             81%, 100% { opacity: 1; }
         }
 
-        /* 🌫️ Nevoeiro */
+        /* Nevoeiro */
         .fog {
             width: 60px;
             height: 40px;
@@ -304,35 +297,89 @@
             from { transform: translateX(-5px); }
             to { transform: translateX(5px); }
         }
+
+        /* Ícone sensação térmica */
+        .thermo-wind {
+            width: 22px;
+            height: 22px;
+            position: relative;
+        }
+
+        .thermo-wind .thermo {
+            width: 8px;
+            height: 18px;
+            border-radius: 4px;
+            background: currentColor;
+            position: absolute;
+            left: 2px;
+            bottom: 2px;
+        }
+
+        .thermo-wind .bulb {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: currentColor;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .thermo-wind .wind-line {
+            position: absolute;
+            width: 14px;
+            height: 3px;
+            background: currentColor;
+            border-radius: 2px;
+            left: 10px;
+            animation: wind-move 3s ease-in-out infinite;
+        }
+
+        .thermo-wind .wind-line:nth-child(3) {
+            top: 4px;
+            animation-delay: 0s;
+        }
+
+        .thermo-wind .wind-line:nth-child(4) {
+            top: 12px;
+            animation-delay: 1s;
+        }
+
+        @keyframes wind-move {
+            0% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(4px); opacity: 1; }
+            100% { transform: translateX(0); opacity: 0.6; }
+        }
+
         @media (max-width: 900px) {
-    body {
-        padding: 15px;
-    }
+            body {
+                padding: 15px;
+            }
 
-    .container {
-        flex-direction: column;
-        align-items: center;
-    }
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
 
-    .coluna {
-        max-width: 100%;
-        width: 100%;
-    }
-}
+            .coluna {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 22px;
-    }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 22px;
+            }
 
-    #cidadeSelect {
-        width: 100%;
-    }
+            #cidadeSelect {
+                width: 100%;
+            }
 
-    .linha {
-        font-size: 14px;
-    }
-}
+            .linha {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -452,7 +499,7 @@ function atualizarTitulos() {
     const depois = new Date(hoje.getTime() + 2 * 86400000);
 
     const format = d => d.toLocaleDateString("pt-PT", {
-        day: "numeric",
+                day: "numeric",
         month: "long"
     });
 
@@ -480,6 +527,66 @@ async function carregarCidades() {
     atualizarPrevisao();
 }
 
+/* Conversão classe → km/h (V1) */
+function ventoPorClasse(classe) {
+    const tabela = {
+        1: 6,
+        2: 12,
+        3: 20,
+        4: 30,
+        5: 40,
+        6: 55,
+        7: 70
+    };
+    return tabela[classe] || 10;
+}
+
+/* Cálculo sensação térmica */
+function calcularSensacao(tMin, tMax, rhMin, rhMax, windMin, windMax, classWind) {
+
+    const T = (tMin + tMax) / 2;
+    const RH = (rhMin + rhMax) / 2;
+
+    let V = 0;
+
+    if (windMin && windMax) {
+        V = (windMin + windMax) / 2;
+    } else {
+        V = ventoPorClasse(classWind);
+    }
+
+    if (T <= 10) {
+        return Math.round(
+            13.12 + 0.6215*T - 11.37*Math.pow(V,0.16) + 0.3965*T*Math.pow(V,0.16)
+        );
+    }
+
+    if (T >= 27) {
+        return Math.round(
+            -8.784 + 1.611*T + 2.338*RH - 0.146*T*RH
+        );
+    }
+
+    return Math.round(T);
+}
+
+/* Ícone sensação térmica (I1 + T1) */
+function iconSensacao(temp) {
+    let cor = "#777";
+
+    if (temp <= 10) cor = "#2196f3";
+    if (temp >= 27) cor = "#e53935";
+
+    return `
+        <div class="thermo-wind" style="color:${cor}">
+            <div class="bulb"></div>
+            <div class="thermo"></div>
+            <div class="wind-line"></div>
+            <div class="wind-line"></div>
+        </div>
+    `;
+}
+
 async function carregarDados(url, colunaId, cidadeID) {
     const resposta = await fetch(url);
     const dados = await resposta.json();
@@ -505,29 +612,56 @@ async function carregarDados(url, colunaId, cidadeID) {
 
     iconBox.innerHTML = iconEstadoTempo(cidade.idWeatherType);
 
-    const campos = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
+    const sensacao = calcularSensacao(
+        cidade.tMin,
+        cidade.tMax,
+        cidade.rhMin,
+        cidade.rhMax,
+        cidade.windSpeedMin,
+        cidade.windSpeedMax,
+        cidade.classWindSpeed
+    );
+
+    const campos = ["tMin", "tMax"];
 
     campos.forEach(campo => {
+        let valor = cidade[campo] + " ºC";
+
         const linha = document.createElement("div");
         linha.className = "linha";
 
+        linha.innerHTML = `
+            ${icons[campo]}
+            <span><strong>${nomesCampos[campo]}:</strong> ${valor}</span>
+        `;
+
+        container.appendChild(linha);
+    });
+
+    /* Sensação térmica (O2) */
+    const linhaSensacao = document.createElement("div");
+    linhaSensacao.className = "linha";
+    linhaSensacao.innerHTML = `
+        ${iconSensacao(sensacao)}
+        <span><strong>Sensação térmica:</strong> ${sensacao} ºC</span>
+    `;
+    container.appendChild(linhaSensacao);
+
+    const restantes = ["precipitaProb", "predWindDir", "classWindSpeed"];
+
+    restantes.forEach(campo => {
         let valor = cidade[campo];
 
-// Adicionar unidades corretas
-if (campo === "tMin" || campo === "tMax") {
-    valor = valor + " ºC";
-}
-if (campo === "precipitaProb") {
-    valor = valor + " %";
-}
-if (campo === "classWindSpeed") {
-    valor = valor + " km/h";
-}
+        if (campo === "precipitaProb") valor += " %";
+        if (campo === "classWindSpeed") valor = ventoPorClasse(valor) + " km/h";
 
-linha.innerHTML = `
-    ${icons[campo]}
-    <span><strong>${nomesCampos[campo]}:</strong> ${valor}</span>
-`;
+        const linha = document.createElement("div");
+        linha.className = "linha";
+
+        linha.innerHTML = `
+            ${icons[campo]}
+            <span><strong>${nomesCampos[campo]}:</strong> ${valor}</span>
+        `;
 
         container.appendChild(linha);
     });
