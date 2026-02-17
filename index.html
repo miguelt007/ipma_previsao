@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPMA PREVISÃO METEOROLÓGICA ATE 3 DIAS</title>
+    <title>IPMA PREVISÃO METEOROLÓGICA ATÉ 3 DIAS</title>
 
     <style>
         body {
@@ -43,21 +43,21 @@
 </head>
 <body>
 
-    <h1>IPMA PREVISÃO METEOROLÓGICA ATE 3 DIAS</h1>
+    <h1>IPMA PREVISÃO METEOROLÓGICA ATÉ 3 DIAS</h1>
 
     <div class="container">
         <div class="coluna" id="coluna1">
-            <h2>API 1</h2>
+            <h2>Hoje</h2>
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna2">
-            <h2>API 2</h2>
+            <h2>Amanhã</h2>
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna3">
-            <h2>API 3</h2>
+            <h2>Depois de Amanhã</h2>
             <div class="conteudo"></div>
         </div>
     </div>
@@ -68,7 +68,9 @@
         const api2 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day1.json";
         const api3 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day2.json";
 
-        // Função genérica para buscar e mostrar dados
+        // ID da cidade (Aveiro = 1010500, Lisboa = 1110600, Porto = 1131200)
+        const cidadeID = 1010500;
+
         async function carregarDados(url, colunaId) {
             try {
                 const resposta = await fetch(url);
@@ -77,11 +79,19 @@
                 const container = document.querySelector(`#${colunaId} .conteudo`);
                 container.innerHTML = "";
 
-                // Aqui assumimos que todas as APIs têm os mesmos campos
-                for (const campo in dados) {
+                // Encontrar a cidade dentro do array "data"
+                const cidade = dados.data.find(item => item.globalIdLocal === cidadeID);
+
+                if (!cidade) {
+                    container.innerHTML = "Cidade não encontrada nesta previsão.";
+                    return;
+                }
+
+                // Mostrar os campos da previsão
+                for (const campo in cidade) {
                     const div = document.createElement("div");
                     div.className = "campo";
-                    div.textContent = `${campo}: ${dados[campo]}`;
+                    div.textContent = `${campo}: ${cidade[campo]}`;
                     container.appendChild(div);
                 }
 
@@ -91,7 +101,6 @@
             }
         }
 
-        // Carregar as 3 APIs
         carregarDados(api1, "coluna1");
         carregarDados(api2, "coluna2");
         carregarDados(api3, "coluna3");
