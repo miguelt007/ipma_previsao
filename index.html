@@ -44,7 +44,7 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
         }
 
         .coluna {
@@ -304,6 +304,35 @@
             from { transform: translateX(-5px); }
             to { transform: translateX(5px); }
         }
+        @media (max-width: 900px) {
+    body {
+        padding: 15px;
+    }
+
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .coluna {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 22px;
+    }
+
+    #cidadeSelect {
+        width: 100%;
+    }
+
+    .linha {
+        font-size: 14px;
+    }
+}
     </style>
 </head>
 
