@@ -16,10 +16,21 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-size: 32px;
             font-weight: 600;
             color: #0d47a1;
+        }
+
+        #cidadeSelect {
+            display: block;
+            margin: 0 auto 30px auto;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #90caf9;
+            width: 260px;
+            background: white;
         }
 
         .container {
@@ -71,6 +82,8 @@
 
     <h1>IPMA PREVISÃO METEOROLÓGICA ATÉ 3 DIAS</h1>
 
+    <select id="cidadeSelect"></select>
+
     <div class="container">
         <div class="coluna" id="coluna1">
             <h2>Previsão 1º dia</h2>
@@ -96,7 +109,7 @@
         const api2 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day1.json";
         const api3 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day2.json";
 
-        const cidadeID = 1010500; // Aveiro
+        const apiCidades = "https://api.ipma.pt/open-data/distrits-islands.json";
 
         const nomesCampos = {
             tMin: "Temperatura mínima (°C)",
@@ -106,7 +119,25 @@
             classWindSpeed: "Intensidade do vento"
         };
 
-        async function carregarDados(url, colunaId, iconId) {
+        async function carregarCidades() {
+            const resposta = await fetch(apiCidades);
+            const dados = await resposta.json();
+
+            const select = document.getElementById("cidadeSelect");
+            select.innerHTML = "";
+
+            dados.data.forEach(cidade => {
+                const option = document.createElement("option");
+                option.value = cidade.globalIdLocal;
+                option.textContent = cidade.local;
+                select.appendChild(option);
+            });
+
+            // Carregar previsão inicial
+            atualizarPrevisao();
+        }
+
+        async function carregarDados(url, colunaId, iconId, cidadeID) {
             try {
                 const resposta = await fetch(url);
                 const dados = await resposta.json();
@@ -116,14 +147,13 @@
 
                 container.innerHTML = "";
 
-                const cidade = dados.data.find(item => item.globalIdLocal === cidadeID);
+                const cidade = dados.data.find(item => item.globalIdLocal == cidadeID);
 
                 if (!cidade) {
-                    container.innerHTML = "Cidade não encontrada nesta previsão.";
+                    container.innerHTML = "Sem dados para esta cidade.";
                     return;
                 }
 
-                // Ícone correto do IPMA
                 iconImg.src = `https://www.ipma.pt/resources.www/icons_svg/weather/w_ic_d_${cidade.idWeatherType}.svg`;
 
                 const camposMostrar = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
@@ -141,9 +171,17 @@
             }
         }
 
-        carregarDados(api1, "coluna1", "icon1");
-        carregarDados(api2, "coluna2", "icon2");
-        carregarDados(api3, "coluna3", "icon3");
+        function atualizarPrevisao() {
+            const cidadeID = document.getElementById("cidadeSelect").value;
+
+            carregarDados(api1, "coluna1", "icon1", cidadeID);
+            carregarDados(api2, "coluna2", "icon2", cidadeID);
+            carregarDados(api3, "coluna3", "icon3", cidadeID);
+        }
+
+        document.getElementById("cidadeSelect").addEventListener("change", atualizarPrevisao);
+
+        carregarCidades();
     </script>
 
 </body>
