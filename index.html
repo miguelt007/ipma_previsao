@@ -35,14 +35,13 @@
 
         .container {
             display: flex;
-            gap: 20px;
             justify-content: center;
-            flex-wrap: wrap;
+            gap: 20px;
+            flex-wrap: nowrap; /* força tudo na mesma linha */
         }
 
         .coluna {
             flex: 1;
-            min-width: 250px;
             max-width: 300px;
             background: white;
             padding: 18px;
@@ -68,7 +67,7 @@
             font-size: 15px;
         }
 
-        .linha img {
+        .linha svg {
             width: 22px;
             height: 22px;
         }
@@ -105,11 +104,11 @@
         const apiCidades = "https://api.ipma.pt/open-data/distrits-islands.json";
 
         const icons = {
-            tMin: "https://img.icons8.com/fluency/48/temperature-low.png",
-            tMax: "https://img.icons8.com/fluency/48/temperature-high.png",
-            precipitaProb: "https://img.icons8.com/fluency/48/rain.png",
-            predWindDir: "https://img.icons8.com/fluency/48/wind-rose.png",
-            classWindSpeed: "https://img.icons8.com/fluency/48/wind.png"
+            tMin: `<svg fill="#2196f3" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
+            tMax: `<svg fill="#e53935" viewBox="0 0 24 24"><path d="M6 2a1 1 0 0 1 1 1v9.278A4.5 4.5 0 1 1 5 12.278V3a1 1 0 0 1 1-1zm1 14.5a2.5 2.5 0 1 0 0-5v5z"/></svg>`,
+            precipitaProb: `<svg fill="#1565c0" viewBox="0 0 24 24"><path d="M12 2l4 6h-8l4-6zm0 20a5 5 0 0 0 5-5H7a5 5 0 0 0 5 5z"/></svg>`,
+            predWindDir: `<svg fill="#0277bd" viewBox="0 0 24 24"><path d="M2 12l20-8-8 20-2-9-10-3z"/></svg>`,
+            classWindSpeed: `<svg fill="#00acc1" viewBox="0 0 24 24"><path d="M4 10h13a3 3 0 1 0-3-3"/><path d="M4 14h9a3 3 0 1 1-3 3"/></svg>`
         };
 
         const nomesCampos = {
@@ -158,7 +157,7 @@
                 linha.className = "linha";
 
                 linha.innerHTML = `
-                    <img src="${icons[campo]}" alt="">
+                    ${icons[campo]}
                     <span><strong>${nomesCampos[campo]}:</strong> ${cidade[campo]}</span>
                 `;
 
