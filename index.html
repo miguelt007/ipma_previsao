@@ -387,6 +387,50 @@ async function obterSol(cidadeID) {
     return dados.data.find(item => item.globalIdLocal == cidadeID);
 }
 
+    /* Ícone principal do estado do tempo (sol, nuvens, chuva, etc.) */
+function iconEstadoTempo(id) {
+
+    // Céu limpo
+    if (id === 1) {
+        return `<div class="weather-icon sun"></div>`;
+    }
+
+    // Pouco nublado / nublado
+    if ([2, 3, 4].includes(id)) {
+        return `<div class="weather-icon cloud"></div>`;
+    }
+
+    // Chuva / aguaceiros
+    if ([5, 6, 7, 8].includes(id)) {
+        return `
+            <div class="weather-icon rain">
+                <div class="drop"></div>
+                <div class="drop"></div>
+                <div class="drop"></div>
+            </div>`;
+    }
+
+    // Trovoada
+    if (id === 9) {
+        return `
+            <div class="weather-icon storm">
+                <div class="bolt"></div>
+            </div>`;
+    }
+
+    // Nevoeiro
+    if ([27, 28].includes(id)) {
+        return `
+            <div class="weather-icon fog">
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>`;
+    }
+
+    // Default: nuvem
+    return `<div class="weather-icon cloud"></div>`;
+}
+
 /* Começo da função carregarDados() */
 async function carregarDados(url, colunaId, cidadeID) {
 
