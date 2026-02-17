@@ -60,14 +60,12 @@
             animation: fadeIn 0.9s ease forwards;
         }
 
-        /* Animação forte e visível */
         @keyframes fadeIn {
             0% { opacity: 0; transform: translateY(40px); }
             60% { opacity: 0.7; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        /* Reanimação quando os dados mudam */
         .animate {
             animation: fadeIn 0.9s ease forwards;
         }
@@ -95,7 +93,6 @@
             font-size: 15px;
         }
 
-        /* Ícones animados */
         .linha svg {
             width: 22px;
             height: 22px;
@@ -115,7 +112,6 @@
             100% { transform: translateY(0); }
         }
 
-        /* MOBILE */
         @media (max-width: 900px) {
             .container {
                 flex-wrap: wrap;
@@ -136,17 +132,17 @@
 
     <div class="container">
         <div class="coluna" id="coluna1">
-            <h2>Previsão 1º dia</h2>
+            <h2 id="titulo1"></h2>
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna2">
-            <h2>Previsão 2º dia</h2>
+            <h2 id="titulo2"></h2>
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna3">
-            <h2>Previsão 3º dia</h2>
+            <h2 id="titulo3"></h2>
             <div class="conteudo"></div>
         </div>
     </div>
@@ -196,6 +192,24 @@
         }
         setInterval(atualizarDataHora, 1000);
         atualizarDataHora();
+
+        function atualizarTitulos() {
+            const hoje = new Date();
+            const amanha = new Date(hoje.getTime() + 86400000);
+            const depois = new Date(hoje.getTime() + 2 * 86400000);
+
+            const format = d => d.toLocaleDateString("pt-PT", {
+                weekday: "long",
+                day: "numeric",
+                month: "long"
+            });
+
+            document.getElementById("titulo1").textContent = `Previsão para hoje — ${format(hoje)}`;
+            document.getElementById("titulo2").textContent = `Previsão para amanhã — ${format(amanha)}`;
+            document.getElementById("titulo3").textContent = `Previsão para depois — ${format(depois)}`;
+        }
+
+        atualizarTitulos();
 
         async function carregarCidades() {
             const resposta = await fetch(apiCidades);
