@@ -34,10 +34,18 @@
 
         .coluna h2 {
             margin-top: 0;
+            text-align: center;
         }
 
         .campo {
             margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .icone {
+            display: block;
+            margin: 10px auto;
+            width: 80px;
         }
     </style>
 </head>
@@ -47,39 +55,52 @@
 
     <div class="container">
         <div class="coluna" id="coluna1">
-            <h2>Hoje</h2>
+            <h2>Previsão 1º dia</h2>
+            <img class="icone" id="icon1">
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna2">
-            <h2>Amanhã</h2>
+            <h2>Previsão 2º dia</h2>
+            <img class="icone" id="icon2">
             <div class="conteudo"></div>
         </div>
 
         <div class="coluna" id="coluna3">
-            <h2>Depois de Amanhã</h2>
+            <h2>Previsão 3º dia</h2>
+            <img class="icone" id="icon3">
             <div class="conteudo"></div>
         </div>
     </div>
 
     <script>
-        // URLs das APIs
         const api1 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day0.json";
         const api2 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day1.json";
         const api3 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day2.json";
 
-        // ID da cidade (Aveiro = 1010500, Lisboa = 1110600, Porto = 1131200)
-        const cidadeID = 1010500;
+        const cidadeID = 1010500; // Aveiro
 
-        async function carregarDados(url, colunaId) {
+        const nomesCampos = {
+            tMin: "Temperatura mínima (°C)",
+            tMax: "Temperatura máxima (°C)",
+            precipitaProb: "Probabilidade de precipitação (%)",
+            predWindDir: "Direção do vento",
+            classWindSpeed: "Intensidade do vento",
+            idWeatherType: "Estado do tempo",
+            latitude: "Latitude",
+            longitude: "Longitude"
+        };
+
+        async function carregarDados(url, colunaId, iconId) {
             try {
                 const resposta = await fetch(url);
                 const dados = await resposta.json();
 
                 const container = document.querySelector(`#${colunaId} .conteudo`);
+                const iconImg = document.getElementById(iconId);
+
                 container.innerHTML = "";
 
-                // Encontrar a cidade dentro do array "data"
                 const cidade = dados.data.find(item => item.globalIdLocal === cidadeID);
 
                 if (!cidade) {
@@ -87,13 +108,19 @@
                     return;
                 }
 
-                // Mostrar os campos da previsão
-                for (const campo in cidade) {
+                // Ícone do estado do tempo
+                iconImg.src = `https://api.ipma.pt/open-data/weather-type-classe.json`;
+                iconImg.src = `https://www.ipma.pt/resources.www/icons_svg/weather/w_ic_d_${cidade.idWeatherType}.svg`;
+
+                // Mostrar apenas campos importantes
+                const camposMostrar = ["tMin", "tMax", "precipitaProb", "predWindDir", "classWindSpeed"];
+
+                camposMostrar.forEach(campo => {
                     const div = document.createElement("div");
                     div.className = "campo";
-                    div.textContent = `${campo}: ${cidade[campo]}`;
+                    div.textContent = `${nomesCampos[campo]}: ${cidade[campo]}`;
                     container.appendChild(div);
-                }
+                });
 
             } catch (erro) {
                 document.querySelector(`#${colunaId} .conteudo`).innerHTML =
@@ -101,9 +128,9 @@
             }
         }
 
-        carregarDados(api1, "coluna1");
-        carregarDados(api2, "coluna2");
-        carregarDados(api3, "coluna3");
+        carregarDados(api1, "coluna1", "icon1");
+        carregarDados(api2, "coluna2", "icon2");
+        carregarDados(api3, "coluna3", "icon3");
     </script>
 
 </body>
