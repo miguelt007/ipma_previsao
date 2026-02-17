@@ -511,10 +511,23 @@ async function carregarDados(url, colunaId, cidadeID) {
         const linha = document.createElement("div");
         linha.className = "linha";
 
-        linha.innerHTML = `
-            ${icons[campo]}
-            <span><strong>${nomesCampos[campo]}:</strong> ${cidade[campo]}</span>
-        `;
+        let valor = cidade[campo];
+
+// Adicionar unidades corretas
+if (campo === "tMin" || campo === "tMax") {
+    valor = valor + " ºC";
+}
+if (campo === "precipitaProb") {
+    valor = valor + " %";
+}
+if (campo === "classWindSpeed") {
+    valor = valor + " km/h";
+}
+
+linha.innerHTML = `
+    ${icons[campo]}
+    <span><strong>${nomesCampos[campo]}:</strong> ${valor}</span>
+`;
 
         container.appendChild(linha);
     });
