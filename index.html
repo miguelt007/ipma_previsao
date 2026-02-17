@@ -505,7 +505,8 @@ function atualizarTitulos() {
 
     const format = d => d.toLocaleDateString("pt-PT", {
         day: "numeric",
-        month: "long"
+        month: "long",
+        year: "numeric"
     });
 
     document.getElementById("titulo1").textContent = `Previsão para ${format(hoje)}`;
