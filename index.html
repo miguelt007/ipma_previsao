@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPMA PREVISÃO METEOROLÓGICA ATE 3 DIAS</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .coluna {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .coluna h2 {
+            margin-top: 0;
+        }
+
+        .campo {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>IPMA PREVISÃO METEOROLÓGICA ATE 3 DIAS</h1>
+
+    <div class="container">
+        <div class="coluna" id="coluna1">
+            <h2>API 1</h2>
+            <div class="conteudo"></div>
+        </div>
+
+        <div class="coluna" id="coluna2">
+            <h2>API 2</h2>
+            <div class="conteudo"></div>
+        </div>
+
+        <div class="coluna" id="coluna3">
+            <h2>API 3</h2>
+            <div class="conteudo"></div>
+        </div>
+    </div>
+
+    <script>
+        // URLs das APIs
+        const api1 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day0.json";
+        const api2 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day1.json";
+        const api3 = "https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day2.json";
+
+        // Função genérica para buscar e mostrar dados
+        async function carregarDados(url, colunaId) {
+            try {
+                const resposta = await fetch(url);
+                const dados = await resposta.json();
+
+                const container = document.querySelector(`#${colunaId} .conteudo`);
+                container.innerHTML = "";
+
+                // Aqui assumimos que todas as APIs têm os mesmos campos
+                for (const campo in dados) {
+                    const div = document.createElement("div");
+                    div.className = "campo";
+                    div.textContent = `${campo}: ${dados[campo]}`;
+                    container.appendChild(div);
+                }
+
+            } catch (erro) {
+                document.querySelector(`#${colunaId} .conteudo`).innerHTML =
+                    "Erro ao carregar dados.";
+            }
+        }
+
+        // Carregar as 3 APIs
+        carregarDados(api1, "coluna1");
+        carregarDados(api2, "coluna2");
+        carregarDados(api3, "coluna3");
+    </script>
+
+</body>
+</html>
